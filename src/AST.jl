@@ -1,0 +1,5 @@
+module AST
+
+# package code goes here
+
+end # module
