@@ -16,13 +16,17 @@ end
 function pipe_file_run(cmd::AbstractString,
                        contents::AbstractString)
     println(cmd)
-    pipe_file = basename("$(cmd).inp")
+    base_cmd = basename(cmd)
+    cmd = mpi_cmd(cmd)
 
-    open(pipe_file, "w") do file
+    inp_file = basename("$(base_cmd).inp")
+    stdout_file = basename("$(base_cmd).stdout")
+
+    open(inp_file, "w") do file
         write(file, contents)
     end
-    run(pipeline(`$cmd`,
-                 stdin=pipe_file))
+
+    run(pipeline(inp_file, cmd, stdout_file))
 end
 
 cpf(src,dst) = cp(src, dst, remove_destination=true)

@@ -26,7 +26,10 @@ end
 
 function nonh()
     # Angular integrals
-    run(`$atsp/nonh`)
+    clean_mpi_tmp(r"fort.[0-9]+",
+                  r"yint.lst.[0-9]+",
+                  r"c.lst.[0-9]+")
+    run(mpi_cmd("$atsp/nonh_mpi"))
 end
 
 function hf(name, term, Z,
@@ -57,7 +60,7 @@ function mchf(name,Z,
               iter = 200,
               cfg_tol = 1e-8,
               scf_tol = 1e-8)
-    pipe_file_run("$atsp/mchf",
+    pipe_file_run("$atsp/mchf_mpi",
                   """$name,$(float(Z))
 $(join(term_weights, '\n'))
 $active
