@@ -16,8 +16,8 @@ end
 function pipe_file_run(cmd::AbstractString,
                        contents::AbstractString)
     println(cmd)
-    pipe_file = "$(cmd).inp"
-    stdout_file = "$(cmd).stdout"
+    pipe_file = basename("$(cmd).inp")
+
     open(pipe_file, "w") do file
         write(file, contents)
     end
