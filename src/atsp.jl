@@ -29,7 +29,7 @@ function nonh()
     clean_mpi_tmp(r"fort.[0-9]+",
                   r"yint.lst.[0-9]+",
                   r"c.lst.[0-9]+")
-    run(mpi_cmd("$atsp/nonh_mpi"))
+    mpi_run(mpi_cmd("$atsp/nonh_mpi"))
 end
 
 function hf(name, term, Z,

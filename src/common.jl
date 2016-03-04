@@ -26,7 +26,7 @@ function pipe_file_run(cmd::AbstractString,
         write(file, contents)
     end
 
-    run(pipeline(inp_file, cmd, stdout_file))
+    mpi_run(pipeline(inp_file, cmd, stdout_file))
 end
 
 cpf(src,dst) = cp(src, dst, remove_destination=true)

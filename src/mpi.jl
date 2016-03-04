@@ -1,12 +1,32 @@
 global mpi = false
 global mpi_np = 1
 global mpi_tmp = ""
+global mpi_disks = ""
 
-function init_mpi(np, tmp)
+function init_mpi(f::Function, np::Int, tmp::AbstractString)
     global mpi = true
     global mpi_np = np
-    global mpi_tmp = tmp
+    global mpi_tmp = "$tmp/$(DateTime(now()))"
     ENV["MPI_TMP"] = mpi_tmp
+    mkdir(mpi_tmp)
+    dirs = []
+    for i = 1:np
+        mkdir(@sprintf("%s/%03d", mpi_tmp, i-1))
+        push!(dirs, "'$mpi_tmp'")
+    end
+
+    global mpi_disks = join(dirs, '\n')
+
+    f()
+
+    rm(mpi_tmp, recursive=true)
+end
+
+function write_mpi_disks()
+    open("disks", "w") do file
+        write(file, "'$(pwd())'\n")
+        write(file, mpi_disks)
+    end
 end
 
 function clean_mpi_tmp(patterns...)
@@ -30,4 +50,9 @@ function mpi_cmd(cmd::AbstractString)
     `$cmd`
 end
 
-export init_mpi, clean_mpi_tmp, mpi_cmd
+function mpi_run(cmd::Union{Cmd,Base.CmdRedirect})
+    mpi && write_mpi_disks()
+    run(cmd)
+end
+
+export init_mpi, write_mpi_disks, clean_mpi_tmp, mpi_cmd, mpi_run
