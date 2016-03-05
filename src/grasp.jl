@@ -43,7 +43,7 @@ $lists
 n ! No more lists
 
 """)
-    cpf("rcsfgenerate.log", "$(replace(active, ",", "_")).exc")
+    cpf("rcsfgenerate.log", "$(active_file(active)).exc")
     cpf("rcsf.out", "rcsf.inp")
 end
 
@@ -82,7 +82,7 @@ function rmcdhf()
 end
 
 function grasp_save_run(active)
-    run(`$grasp/rsave $(replace(active, ",", "_"))`)
+    run(`$grasp/rsave $(active_file(active))`)
 end
 
 function grasp_cp_wfn(a,b)
@@ -103,7 +103,7 @@ function parse_eng(level, J, parity,
 end
 
 function read_eng(active)
-    open("$(replace(active, ",", "_")).sum") do file
+    open("$(active_file(active)).sum") do file
         for line in enumerate(eachline(file))
             strip(line[2]) == "Eigenenergies:" && break
         end

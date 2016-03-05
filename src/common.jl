@@ -45,4 +45,6 @@ function load_eng(directory)
     end
 end
 
+active_file(active) = replace(active, ",", "_")
+
 export dir_run, pipe_file_run, cpf, y_or_n, save_eng, load_eng

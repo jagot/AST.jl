@@ -17,7 +17,7 @@ function csfgenerate(active, lists)
 n ! No more lists
 
 """)
-    cpf("csfexcitation.log", "$(replace(active, ",", "_")).exc")
+    cpf("csfexcitation.log", "$(active_file(active)).exc")
     lsgen_inp = split(readall(open("excitationdata.sh")), "\n")
     pipe_file_run("$atsp/lsgen",
                   join(lsgen_inp[3:end-2], "\n"))
@@ -78,7 +78,7 @@ end
 
 function atsp_save_run(active)
     cpf("wfn.out", "wfn.inp")
-    active = replace(active, ",", "_")
+    active = active_file(active)
     cpf("wfn.out", "$active.w")
     # cpf("cfg.out", "$active.c")
     cpf("summry", "$active.s")
