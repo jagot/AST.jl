@@ -76,34 +76,34 @@ y ! Default values for ACFG,LD,TRACE
 """)
 end
 
-function atsp_save_run(active, term)
+function atsp_save_run(name, term)
     cpf("wfn.out", "wfn.inp")
-    active = active_file(active)
-    cpf("wfn.out", "$active.w")
-    cpf("summry", "$active.s")
-    cpf("clist.out", "$active.c")
-    cpf(filter(f -> ismatch(Regex("^$term.\\.l\$"), f), readdir())[1], "$active.l")
+    name = active_file(name)
+    cpf("wfn.out", "$name.w")
+    cpf("summry", "$name.s")
+    cpf("clist.out", "$name.c")
+    cpf(filter(f -> ismatch(Regex("^$term.\\.l\$"), f), readdir())[1], "$name.l")
 end
 
-function breit_pauli(active, term,
+function breit_pauli(name, term,
                      restarting = false,
                      guesses = false,
                      which_op = 2,
                      all_rel = true,
                      all_inter = true,
                      def_Rydberg = true)
-    active = active_file(active)
+    name = active_file(name)
 
-    println(pwd(), " ", isfile("$active.l"))
-    isfile("$active.l") || error("Could not find $active.l")
+    println(pwd(), " ", isfile("$name.l"))
+    isfile("$name.l") || error("Could not find $name.l")
     j2 = term_to_2j_range(term)
     eiv = join([1 for jj in maximum(j2):-2:minimum(j2)], '\n')
-    println("$term => J ∈ $(j2_to_jstr(j2))")
+    println("$term ⟹ J ∈ $(j2_to_jstr(j2))")
 
     pipe_file_run("$atsp/bpci",
-                  """$active, y, n ! Atom, relativistic, mass correction
+                  """$name, y, n ! Atom, relativistic, mass correction
 $(y_or_n(restarting)) ! Restarting
-$(y_or_n(guesses)) ! Existing $active.l/.j as guesses
+$(y_or_n(guesses)) ! Existing $name.l/.j as guesses
 $(maximum(j2)),$(minimum(j2)) ! max(2J),min(2J)
 $eiv ! Eigenvalues
 $which_op ! Non-relativistic operators and selected relativistic
@@ -125,8 +125,8 @@ function read_hf_eng()
     end
 end
 
-function read_eng_blocks(f::Function, active, ending)
-    open("$(active_file(active)).$ending") do file
+function read_eng_blocks(f::Function, name, ending)
+    open("$(active_file(name)).$ending") do file
         f() do
             while !ismatch(r"^[ ]*2\*J =", readline(file)); end
             readline(file)
@@ -135,17 +135,17 @@ function read_eng_blocks(f::Function, active, ending)
     end
 end
 
-function read_mchf_eng(active)
-    # Read the total (non-relativistic) energy from $active.l
-    read_eng_blocks(active, "l") do read_block
+function read_mchf_eng(name)
+    # Read the total (non-relativistic) energy from $name.l
+    read_eng_blocks(name, "l") do read_block
         read_block()
     end
 end
 
-function read_breit_pauli_eng(active, term)
+function read_breit_pauli_eng(name, term)
     j2 = term_to_2j_range(term)
-    # Read the total (Breit–Pauli corrected) energies from $active.j
-    read_eng_blocks(active, "j") do read_block
+    # Read the total (Breit–Pauli corrected) energies from $name.j
+    read_eng_blocks(name, "j") do read_block
         [read_block()
          for jj in maximum(j2):-2:minimum(j2)]
     end
