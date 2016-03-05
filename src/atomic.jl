@@ -18,4 +18,10 @@ function term_to_2j_range(term)
     abs(2L-S2):(2L+S2)
 end
 
-export ells, degeneracy, split_ref_set, term_to_2j_range
+function j2_to_jstr(j2)
+    jstr = i -> round(Int,i) == i ? round(Int, i) : "$(num(i))/$(den(i))"
+    s = join(map(jstr, (minimum(j2):2:maximum(j2))//2), ", ")
+    "[$s]"
+end
+
+export ells, degeneracy, split_ref_set, term_to_2j_range, j2_to_jstr
