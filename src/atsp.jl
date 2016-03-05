@@ -78,12 +78,15 @@ end
 
 function atsp_save_run(active)
     cpf("wfn.out", "wfn.inp")
-    run(`$atsp/save $(replace(active, ",", "_"))`)
+    active = replace(active, ",", "_")
+    cpf("wfn.out", "$active.w")
+    # cpf("cfg.out", "$active.c")
+    cpf("summry", "$active.s")
 end
 
 function atsp_cp_wfn(a,b)
     mkpath("$b")
-    cpf("$a/wfn.inp", "$b/wfn.inp")
+    cpf("$a/wfn.out", "$b/wfn.inp")
 end
 
 function read_hf_eng()
