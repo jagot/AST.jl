@@ -96,7 +96,7 @@ function breit_pauli(name, term,
 
     isfile("$name.l") || error("Could not find $name.l")
     j2 = term_to_2j_range(term)
-    eiv = join([1 for jj in maximum(j2):-2:minimum(j2)], '\n')
+    eiv = join([1 for jj in reverse(j2)], '\n')
     println("$term ⟹ J ∈ $(j2_to_jstr(j2))")
 
     pipe_file_run("$atsp/bpci",
@@ -146,7 +146,7 @@ function read_breit_pauli_eng(name, term)
     # Read the total (Breit–Pauli corrected) energies from $name.j
     read_eng_blocks(name, "j") do read_block
         [read_block()
-         for jj in maximum(j2):-2:minimum(j2)]
+         for jj in reverse(j2)]
     end
 end
 

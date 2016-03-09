@@ -15,7 +15,7 @@ function term_to_2j_range(term)
     m = match(r"([0-9]+)([A-Z])", term)
     S2 = parse(Int, m[1]) - 1
     L = searchindex(ells, lowercase(m[2])) - 1
-    abs(2L-S2):(2L+S2)
+    abs(2L-S2):2:(2L+S2)
 end
 
 jstr(i) = round(Int,i) == i ? round(Int, i) : "$(num(i))/$(den(i))"
