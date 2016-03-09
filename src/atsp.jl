@@ -94,7 +94,6 @@ function breit_pauli(name, term,
                      def_Rydberg = true)
     name = active_file(name)
 
-    println(pwd(), " ", isfile("$name.l"))
     isfile("$name.l") || error("Could not find $name.l")
     j2 = term_to_2j_range(term)
     eiv = join([1 for jj in maximum(j2):-2:minimum(j2)], '\n')
