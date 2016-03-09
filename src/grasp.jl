@@ -81,8 +81,8 @@ function rmcdhf()
     run(`$grasp/rmcdhf`)
 end
 
-function grasp_save_run(active)
-    run(`$grasp/rsave $(active_file(active))`)
+function grasp_save_run(name)
+    run(`$grasp/rsave $(active_file(name))`)
 end
 
 function grasp_cp_wfn(a,b)
@@ -102,8 +102,8 @@ function parse_eng(level, J, parity,
          :eV => parse(Float64, replace(eV, "D", "e")))
 end
 
-function read_eng(active)
-    open("$(active_file(active)).sum") do file
+function read_eng(name)
+    open("$(active_file(name)).sum") do file
         for line in enumerate(eachline(file))
             strip(line[2]) == "Eigenenergies:" && break
         end
