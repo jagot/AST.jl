@@ -159,5 +159,71 @@ function atsp_clean()
     end
 end
 
-export csfgenerate_input, csfgenerate, nonh, hf, mchf, atsp_save_run, breit_pauli,
-atsp_cp_wfn, read_hf_eng, read_mchf_eng, read_breit_pauli_eng, atsp_clean
+
+function hf_mchf_bp(ref_set_list, term, Z,
+                    ncorr,
+                    active::Function,
+                    wfn0 = nothing;
+                    overwrite = true)
+    conf = "$(join(map(orb -> "$(orb[1])$(orb[2])",
+                       ref_set_list), ""))_$term"
+    ref_set = join(map(orb -> "$(orb[1])($(orb[2]),$(orb[3]))",
+                       ref_set_list), "")
+
+    overwrite_i = i -> overwrite && isdir("$i") || !isdir("$i")
+    dir_run(conf) do
+        energies = zeros(ncorr+1)
+        j2 = term_to_2j_range(term)
+        bp_energies = zeros(ncorr+1, length(j2))
+
+        # Hartree--Fock run
+        overwrite_i(0) && dir_run("0") do
+            if wfn0 != nothing
+                println("Initial guess: $wfn0")
+                cpf(wfn0, "wfn.inp")
+            end
+            csfgenerate(active(0),
+                        [([ref_set], term, 0)])
+            nonh()
+            hf(conf, term, Z,
+               (),
+               join(map(orb -> "$(orb[1])($(orb[2]))", ref_set_list), ""))
+            atsp_clean()
+        end
+
+        dir_run("0") do
+            energies[1] = read_hf_eng()
+            bp_energies[1,:] = energies[1]
+        end
+
+        # Multiconfigurational Hartree--Fock, layer by layer, with
+        # additional Breit--Pauli calculation at the end of each run
+        for i = 1:ncorr
+            atsp_cp_wfn(i-1,i)
+            overwrite_i(i) && dir_run("$i") do
+                csfgenerate(active(i),
+                            [([ref_set], term, 2)])
+                nonh()
+                mchf(conf, Z, 1,
+                     active(i))
+                atsp_save_run(conf, term)
+                breit_pauli(conf, term)
+                atsp_clean()
+            end
+
+            dir_run("$i") do
+                energies[i+1] = read_mchf_eng(conf)
+                bp_energies[i+1,:] = read_breit_pauli_eng(conf, term)
+            end
+        end
+
+        save_eng([energies bp_energies]')
+    end
+    conf, abspath("$conf/$ncorr/wfn.out")
+end
+
+export csfgenerate_input, csfgenerate, nonh, hf, mchf,
+atsp_save_run, breit_pauli,
+atsp_cp_wfn, read_hf_eng, read_mchf_eng, read_breit_pauli_eng,
+atsp_clean,
+hf_mchf_bp
