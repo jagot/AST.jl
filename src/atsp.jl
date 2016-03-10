@@ -166,7 +166,7 @@ function hf_mchf_bp(ref_set_list, term, Z,
                     wfn0 = nothing;
                     overwrite = true)
     conf = "$(join(map(orb -> "$(orb[1])$(orb[2])",
-                       ref_set_list), ""))_$term"
+                       ref_set_list), "_"))_$term"
     ref_set = join(map(orb -> "$(orb[1])($(orb[2]),$(orb[3]))",
                        ref_set_list), "")
 
