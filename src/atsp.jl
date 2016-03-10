@@ -85,13 +85,13 @@ function atsp_save_run(name, term)
     cpf(filter(f -> ismatch(Regex("^$term.\\.l\$"), f), readdir())[1], "$name.l")
 end
 
-function breit_pauli(name, term,
+function breit_pauli(name, term;
                      restarting = false,
                      guesses = false,
                      which_op = 2,
                      all_rel = true,
                      all_inter = true,
-                     def_Rydberg = true)
+                     atom_mass = Inf)
     name = active_file(name)
 
     (isfile("$name.l") && isfile("$name.c")) || error("Could not find $name.l/c")
@@ -99,6 +99,8 @@ function breit_pauli(name, term,
     j2 = term_to_2j_range(term)
     eiv = join([1 for jj in reverse(j2)], '\n')
     println("$term ⟹ J ∈ $(j2_to_jstr(j2))")
+
+    atom_mass_s = (atom_mass == Inf) ? "" : "\n$atom_mass"
 
     pipe_file_run("$atsp/bpci",
                   """$name, y, n ! Atom, relativistic, mass correction
@@ -109,7 +111,7 @@ $eiv ! Eigenvalues
 $which_op ! Non-relativistic operators and selected relativistic
 $(y_or_n(all_rel)) ! All relativistic operators
 $(y_or_n(all_inter)) ! All interactions
-$(y_or_n(def_Rydberg)) ! Default Rydberg constant
+$(y_or_n(atom_mass == Inf)) ! Default Rydberg constant$(atom_mass_s)
 """)
     cpf("$name.l.bak", "$name.l")
 end
@@ -164,7 +166,8 @@ function hf_mchf_bp(ref_set_list, term, Z,
                     ncorr,
                     active::Function,
                     wfn0 = nothing;
-                    overwrite = true)
+                    overwrite = true,
+                    atom_mass = Inf)
     conf = "$(join(map(orb -> "$(orb[1])$(orb[2])",
                        ref_set_list), "_"))_$term"
     ref_set = join(map(orb -> "$(orb[1])($(orb[2]),$(orb[3]))",
@@ -205,9 +208,11 @@ function hf_mchf_bp(ref_set_list, term, Z,
                             [([ref_set], term, 2)])
                 nonh()
                 mchf(conf, Z, 1,
-                     active(i))
+                     active(i),
+                     join(map(orb -> "$(orb[1])",
+                              ref_set_list), ","))
                 atsp_save_run(conf, term)
-                breit_pauli(conf, term)
+                breit_pauli(conf, term; atom_mass = atom_mass)
                 atsp_clean()
             end
 
