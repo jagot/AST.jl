@@ -94,7 +94,8 @@ function breit_pauli(name, term,
                      def_Rydberg = true)
     name = active_file(name)
 
-    isfile("$name.l") || error("Could not find $name.l")
+    (isfile("$name.l") && isfile("$name.c")) || error("Could not find $name.l/c")
+    cpf("$name.l", "$name.l.bak")
     j2 = term_to_2j_range(term)
     eiv = join([1 for jj in reverse(j2)], '\n')
     println("$term ⟹ J ∈ $(j2_to_jstr(j2))")
@@ -110,6 +111,7 @@ $(y_or_n(all_rel)) ! All relativistic operators
 $(y_or_n(all_inter)) ! All interactions
 $(y_or_n(def_Rydberg)) ! Default Rydberg constant
 """)
+    cpf("$name.l.bak", "$name.l")
 end
 
 function atsp_cp_wfn(a,b)
