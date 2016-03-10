@@ -164,8 +164,8 @@ end
 
 function hf_mchf_bp(ref_set_list, term, Z,
                     ncorr,
-                    active::Function,
                     wfn0 = nothing;
+                    active::Function = active_set,
                     overwrite = true,
                     atom_mass = Inf)
     conf = "$(join(map(orb -> "$(orb[1])$(orb[2])",
@@ -185,7 +185,7 @@ function hf_mchf_bp(ref_set_list, term, Z,
                 println("Initial guess: $wfn0")
                 cpf(wfn0, "wfn.inp")
             end
-            csfgenerate(active(0),
+            csfgenerate(active(ref_set_list, 0),
                         [([ref_set], term, 0)])
             nonh()
             hf(conf, term, Z,
@@ -204,11 +204,11 @@ function hf_mchf_bp(ref_set_list, term, Z,
         for i = 1:ncorr
             atsp_cp_wfn(i-1,i)
             overwrite_i(i) && dir_run("$i") do
-                csfgenerate(active(i),
+                csfgenerate(active(ref_set_list, i),
                             [([ref_set], term, 2)])
                 nonh()
                 mchf(conf, Z, 1,
-                     active(i),
+                     active(ref_set_list, i),
                      join(map(orb -> "$(orb[1])",
                               ref_set_list), ","))
                 atsp_save_run(conf, term)

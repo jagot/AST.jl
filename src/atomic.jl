@@ -25,4 +25,32 @@ function j2_to_jstr(j2)
     "[$s]"
 end
 
-export ells, degeneracy, split_ref_set, term_to_2j_range, jstr, j2_to_jstr
+# Only capable of providing active sets for configurations with no
+# holes below in any ell channel.
+function active_set(ref_set, i)
+    open_set = filter(orb -> orb[3] != "c", ref_set)
+
+    occ = Dict{Char,Vector{Int}}()
+    for o in open_set
+        ell = o[1][end]
+        occ[ell] = push!(get(occ, ell, Vector{Int}([])), parse(Int, o[1][1:end-1]))
+    end
+
+    ell_ind = Vector{Int}([searchindex(ells,ell) for ell in keys(occ)])
+    ell_min,ell_max = minimum(ell_ind),maximum(ell_ind)
+
+    trunc_neg = v -> v > 0 ? v : 0
+
+    active = Dict{Char,Int}()
+    c = map(1:(ell_max+i)) do ellp1
+        ell = ells[ellp1]
+        max_occ = maximum(get(occ, ell, [0]))
+        # Amount of extra to add, if this ell channel is not occupied at all
+        extra = trunc_neg(round(Int, ellp1>ell_max)*(i-(ellp1-ell_max)))
+        n = max(max_occ + i, ellp1 + extra)
+        "$n$ell"
+    end
+    join(c, ",")
+end
+
+export ells, degeneracy, split_ref_set, term_to_2j_range, jstr, j2_to_jstr, active_set
