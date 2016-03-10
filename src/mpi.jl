@@ -22,6 +22,8 @@ function init_mpi(f::Function, np::Int, tmp::AbstractString)
     rm(mpi_tmp, recursive=true)
     mpi = false
     mpi_np = 1
+
+    nothing
 end
 
 function write_mpi_disks()
