@@ -170,7 +170,7 @@ function hf_mchf_bp(ref_set_list, term, Z,
     ref_set = join(map(orb -> "$(orb[1])($(orb[2]),$(orb[3]))",
                        ref_set_list), "")
 
-    overwrite_i = i -> overwrite && isdir("$i") || !isdir("$i")
+    overwrite_i = i -> overwrite && isfile("$i/wfn.out") || !isfile("$i/wfn.out")
     dir_run(conf) do
         energies = zeros(ncorr+1)
         j2 = term_to_2j_range(term)
