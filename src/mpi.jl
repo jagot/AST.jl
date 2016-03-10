@@ -17,13 +17,13 @@ function init_mpi(f::Function, np::Int, tmp::AbstractString)
 
     global mpi_disks = join(dirs, '\n')
 
-    f()
+    res = f()
 
     rm(mpi_tmp, recursive=true)
     mpi = false
     mpi_np = 1
 
-    nothing
+    res
 end
 
 function write_mpi_disks()
