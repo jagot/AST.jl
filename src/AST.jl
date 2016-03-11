@@ -6,6 +6,7 @@ catch
     error("Run Pkg.build(\"AST\") first")
 end
 include("atomic.jl")
+include("terms.jl")
 include("mpi.jl")
 include("common.jl")
 include("atsp.jl")
