@@ -22,3 +22,5 @@ function terms(ref_set)
     end
     vcat([["$(round(Int, ESS2P1))$(uppercase(ells[ELL+1]))" for ESS2P1 in 2S + 1] for ELL in L]...)
 end
+
+export terms

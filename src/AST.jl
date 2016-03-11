@@ -11,5 +11,6 @@ include("mpi.jl")
 include("common.jl")
 include("atsp.jl")
 include("grasp.jl")
+include("state_graph.jl")
 
 end
