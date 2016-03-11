@@ -11,7 +11,8 @@ State(ref_set::Vector,
       exp_eng = Inf;
       kwargs...) = State(ref_set, Dict(kwargs), exp_eng, nothing)
 
-state_graph = graph(Vector{State}(),Vector{Edge{State}}())
+state_graph_init = () -> graph(Vector{State}(),Vector{Edge{State}}())
+state_graph = state_graph_init()
 
 function add_state!(dep::Union{State,Void}, args...; kwargs...)
     s = State(args...; kwargs...)
@@ -21,6 +22,11 @@ function add_state!(dep::Union{State,Void}, args...; kwargs...)
     s
 end
 add_state!(args...; kwargs...) = add_state!(nothing, args...; kwargs...)
+
+function clear_states!()
+    global state_graph
+    state_graph = state_graph_init()
+end
 
 # Used to perform calculation using MPI codes if that is
 # requested. However, certain state calculations may be explicitly
@@ -92,4 +98,4 @@ function calc_states_atsp(Z; kwargs...)
     end
 end
 
-export add_state!, calc_states, calc_states_atsp
+export add_state!, clear_states!, calc_states, calc_states_atsp
