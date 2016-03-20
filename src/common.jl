@@ -1,4 +1,5 @@
 using JLD
+using AtomicLevels
 
 function dir_run(f::Function, wd::AbstractString)
     mkpath(wd)
@@ -45,6 +46,6 @@ function load_eng(directory)
     end
 end
 
-active_file(active) = replace(active, ",", "_")
+active_file(active::Config, term::Term) = string(join(map(string, active), "_"), "_", string(term))
 
 export dir_run, pipe_file_run, cpf, y_or_n, save_eng, load_eng

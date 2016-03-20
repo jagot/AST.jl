@@ -6,11 +6,11 @@ catch
     error("Run Pkg.build(\"AST\") first")
 end
 include("atomic.jl")
-include("terms.jl")
+include("active_set.jl")
 include("mpi.jl")
 include("common.jl")
 include("atsp.jl")
 include("grasp.jl")
-include("state_graph.jl")
+include("level_graph.jl")
 
 end
