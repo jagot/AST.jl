@@ -9,7 +9,7 @@ type LevelVertex
     wfn
 end
 import Graphs.attributes
-function attributes(l::Level, g::AbstractGraph)
+function attributes(l::LevelVertex, g::AbstractGraph)
     Dict{UTF8String,Any}("label" => "$(l.config) $(l.term)")
 end
 

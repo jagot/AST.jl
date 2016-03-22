@@ -1,57 +1,5 @@
 using AtomicLevels
 
-function orbital_string(c::Config,
-                        occ = true, status = true,
-                        sep = "")
-    c = map(c) do orb
-        s = "$(orb[1])$(ells[orb[2]+1])"
-        if occ
-            if status
-                s = string(s, "($(orb[3]),$(orb[4]))")
-            else
-                s = string(s, "($(orb[3]))")
-            end
-        else
-            s
-        end
-    end
-    join(c, sep)
-end
-
-function csfgenerate_input(active::Config,
-                           term,
-                           nexc,
-                           configurations...)
-    configurations = map(configurations) do c
-        orbital_string(c)
-    end
-    """$(join(configurations, '\n')) ! Configurations
-
-$(orbital_string(active, false, false, ","))
-$(string(term)) ! Resulting term
-$nexc ! Number of excitations"""
-end
-
-function csfgenerate(active::Config, lists...)
-    # If core not in list, the value is zero (no core)
-    lists = join(map(l -> csfgenerate_input(active, l...), lists), "\ny\n")
-    pipe_file_run("$atsp/csfexcitation",
-                  """$lists
-n ! No more lists
-
-""")
-    cpf("csfexcitation.log", "$(string(active)).exc")
-    lsgen_inp = split(readall(open("excitationdata.sh")), "\n")
-    pipe_file_run("$atsp/lsgen",
-                  join(lsgen_inp[3:end-2], "\n"))
-    cpf("clist.out", "cfg.inp")
-    # Filter out active orbitals not present in the CSF list here
-    cfgs = readall("clist.out")
-    filter(active) do a
-        contains(cfgs, "$(a[1])$(ells[a[2]+1])")
-    end
-end
-
 function nonh()
     # Angular integrals
     clean_mpi_tmp(r"fort.[0-9]+",
@@ -200,8 +148,9 @@ function hf_mchf_bp(config::Config,
                     wfn0 = nothing;
                     active::Function = active_set,
                     overwrite = true,
-                    atom_mass = Inf)
-    println(repeat("=", 100))
+                    atom_mass = Inf,
+                    csf_filter = (a...) -> true)
+    println(repeat("=", 80))
     conf = active_file(config, term)
     println(config, " ", term)
 
@@ -219,6 +168,7 @@ function hf_mchf_bp(config::Config,
                 cpf(wfn0, "wfn.inp")
             end
             csfgenerate(active(config, 0),
+                        csf_filter,
                         (term, 0, config))
             nonh()
             hf(conf, term, Z,
@@ -238,6 +188,7 @@ function hf_mchf_bp(config::Config,
             atsp_cp_wfn(i-1,i)
             overwrite_i(i) && dir_run("$i") do
                 act = csfgenerate(active(config, i),
+                                  csf_filter,
                                   (term, 2, config))
                 nonh()
                 mchf(conf, Z, 1,

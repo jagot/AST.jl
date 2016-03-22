@@ -46,6 +46,24 @@ function load_eng(directory)
     end
 end
 
+function orbital_string(c::Config,
+                        occ = true, status = true,
+                        sep = "")
+    c = map(c) do orb
+        s = "$(orb[1])$(ells[orb[2]+1])"
+        if occ
+            if status
+                s = string(s, "($(orb[3]),$(orb[4]))")
+            else
+                s = string(s, "($(orb[3]))")
+            end
+        else
+            s
+        end
+    end
+    join(c, sep)
+end
+
 active_file(active::Config, term::Term) = string(join(map(string, active), "_"), "_", string(term))
 
 export dir_run, pipe_file_run, cpf, y_or_n, save_eng, load_eng
