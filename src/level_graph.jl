@@ -118,4 +118,11 @@ function calc_levels_atsp(Z; kwargs...)
     end
 end
 
-export add_level!, add_levels!, clear_levels!, calc_levels, calc_levels_atsp
+function plot_level_graph(filename)
+    stdin, proc = open(`neato -T$(splitext(filename)[2][2:end]):cairo -o "$filename"`, "w")
+    to_dot(AST.level_graph, stdin)
+    close(stdin)
+    filename
+end
+
+export add_level!, add_levels!, clear_levels!, calc_levels, calc_levels_atsp, plot_level_graph
