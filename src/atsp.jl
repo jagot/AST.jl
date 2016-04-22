@@ -58,7 +58,7 @@ function atsp_save_run(config, term)
     cpf("wfn.out", "$name.w")
     cpf("summry", "$name.s")
     cpf("clist.out", "$name.c")
-    cpf(filter(f -> ismatch(Regex("^$(string(term)).\\.l\$"), f), readdir())[1], "$name.l")
+    cpf(filter(f -> ismatch(Regex("^$(string(term)).*\\.l\$"), f), readdir())[1], "$name.l")
 end
 
 function breit_pauli(config, term;
