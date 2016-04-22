@@ -1,4 +1,5 @@
 using InterpNd
+using PyPlot
 
 function add_partial_waves(data, orbitals)
     ml = maximum(map(d -> size(d,2), data))
@@ -15,10 +16,8 @@ function add_partial_waves(data, orbitals)
 end
 
 function plot_wfn(config::Config, term::Term, ncorr)
-    println(pwd())
     filename = active_file(config, term)
     dir = "$filename/$ncorr"
-    tf = tempname()
     sep = "    0.0000       0.000"
     cp = r"([0-9]+)([a-z])\(([ 0-9]+?)\)"
     orbitals,data = dir_run(dir) do
@@ -42,12 +41,12 @@ function plot_wfn(config::Config, term::Term, ncorr)
     end
     subplot(211)
     for i in eachindex(orbitals)
-        plot(data[i][1,:]',data[i][2,:]'.^2,label=string(orbitals[i]))
+        PyPlot.plot(data[i][1,:]',data[i][2,:]'.^2,label=string(orbitals[i]))
     end
     legend(framealpha=0.75)
     margins(0,0.1)
     subplot(212)
-    plot(add_partial_waves(data,orbitals)...)
+    PyPlot.plot(add_partial_waves(data,orbitals)...)
     margins(0,0.1)
 end
 
