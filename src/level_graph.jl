@@ -119,7 +119,7 @@ function calc_levels_atsp(Z; kwargs...)
 end
 
 function plot_level_graph(filename)
-    stdin, proc = open(`neato -T$(splitext(filename)[2][2:end]):cairo -o "$filename"`, "w")
+    stdin, proc = open(`neato -T$(splitext(filename)[2][2:end]) -o "$filename"`, "w")
     to_dot(AST.level_graph, stdin)
     close(stdin)
     filename
