@@ -13,5 +13,6 @@ include("csfs.jl")
 include("atsp.jl")
 include("grasp.jl")
 include("level_graph.jl")
+include("plots.jl")
 
 end
