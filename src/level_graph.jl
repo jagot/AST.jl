@@ -39,8 +39,12 @@ add_level!(args...; kwargs...) = add_level!(nothing, args...; kwargs...)
 
 function add_levels!(dep::Union{LevelVertex,Void}, config::Config, args...; kwargs...)
     ts = terms(config)
-    for t in ts
-        dep = add_level!(dep, config, t, args...; kwargs...)
+    for i in eachindex(ts)
+        a = copy(args)
+        if length(a) > 0 && length(a[1]) > 1
+            a = (a[1][i],a[2:end]...)
+        end
+        dep = add_level!(dep, config, ts[i], a...; kwargs...)
     end
     dep
 end
