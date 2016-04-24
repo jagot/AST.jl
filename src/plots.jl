@@ -17,6 +17,9 @@ end
 
 function plot_wfn(config::Config, term::Term, ncorr)
     filename = active_file(config, term)
+    conf_orbs = map(config) do o
+        Orbital((o[1],o[2],1,"*"))
+    end
     dir = "$filename/$ncorr"
     sep = "    0.0000       0.000"
     cp = r"([0-9]+)([a-z])\(([ 0-9]+?)\)"
@@ -26,7 +29,7 @@ function plot_wfn(config::Config, term::Term, ncorr)
                 ref_set_list("$(m[1])$(m[2])")[1]
             end
         end
-        orbitals = sort(unique(vcat(clist...)))
+        orbitals = sort(unique(vcat(conf_orbs...,clist...)))
         rd,wr = redirect_stdin()
         for o in orbitals
             write(wr, " \n")
