@@ -14,5 +14,6 @@ include("atsp.jl")
 include("grasp.jl")
 include("level_graph.jl")
 include("plots.jl")
+include("result_table.jl")
 
 end
