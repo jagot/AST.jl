@@ -18,9 +18,9 @@ function hf(name, term::Term, Z,
 
     pipe_file_run("$atsp/hf",
                   """$name,$(string(term)),$(float(Z)) ! Name, final term, Z (next row: closed orbitals)
-$closed
+ $closed
 $(orbital_string(ref_set, true, false)) ! Electrons outside closed orbitals
-$vary ! Vary $all orbitals
+$vary ! Which orbitals to vary
 $(y_or_n(default_electron_parameters)) ! Default electron parameters
 $(y_or_n(default_rem_parameters)) ! Default values for remaining parameters
 $(y_or_n(length(additional_parameters)>0)) ! Additional parameters
@@ -149,7 +149,9 @@ function hf_mchf_bp(config::Config,
                     active::Function = active_set,
                     overwrite = true,
                     atom_mass = Inf,
-                    csf_filter = (a...) -> true)
+                    csf_filter = (a...) -> true,
+                    hf_core = true,
+                    bp = true)
     println(repeat("=", 80))
     conf = active_file(config, term)
     println(config, " ", term)
@@ -172,8 +174,9 @@ function hf_mchf_bp(config::Config,
                         (term, 0, config))
             nonh()
             hf(conf, term, Z,
-               Config(),
-               config)
+               closed(config),
+               open(config),
+               hf_core ? "all" : "=$(length(open(config)))")
             atsp_clean()
         end
 
@@ -194,13 +197,13 @@ function hf_mchf_bp(config::Config,
                 mchf(conf, Z, 1,
                      act, config)
                 atsp_save_run(config, term)
-                breit_pauli(config, term; atom_mass = atom_mass)
+                bp && breit_pauli(config, term; atom_mass = atom_mass)
                 atsp_clean()
             end
 
             dir_run("$i") do
                 energies[i+1] = read_mchf_eng(config, term)
-                bp_energies[i+1,:] = read_breit_pauli_eng(config, term)
+                bp && (bp_energies[i+1,:] = read_breit_pauli_eng(config, term))
             end
         end
 
