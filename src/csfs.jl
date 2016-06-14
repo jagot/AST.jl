@@ -10,7 +10,7 @@ function csfgenerate_input(active::Config,
     """$(join(configurations, '\n')) ! Configurations
 
 $(orbital_string(active, false, false, ","))
-$(string(term)) ! Resulting term
+$(string(term,false)) ! Resulting term
 $nexc ! Number of excitations"""
 end
 
