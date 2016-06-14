@@ -46,6 +46,22 @@ function filter_csfs(f::Function)
     cpf("clist.filtered.out", "clist.out")
 end
 
+function lsgen()
+    lsgen_inp = split(readall(open("excitationdata.sh")), "\n")
+    lsgen_start = "lsgen << EOF"
+    lsgen_end = "EOF"
+    i = 1
+    j = 1
+    while true
+        i = findnext(lsgen_inp, lsgen_start, j)
+        i == 0 && break
+        j = findnext(lsgen_inp, lsgen_end, i)
+        pipe_file_run("$atsp/lsgen",
+                      join(lsgen_inp[i+1:j-1], "\n"))
+        cpf("clist.out", "clist.inp")
+    end
+end
+
 function csfgenerate(active::Config, csf_filter::Function, lists...)
     # If core not in list, the value is zero (no core)
     lists = join(map(l -> csfgenerate_input(active, l...), lists), "\ny\n")
@@ -55,9 +71,7 @@ n ! No more lists
 
 """)
     cpf("csfexcitation.log", "$(string(active)).exc")
-    lsgen_inp = split(readall(open("excitationdata.sh")), "\n")
-    pipe_file_run("$atsp/lsgen",
-                  join(lsgen_inp[3:end-2], "\n"))
+    lsgen()
 
     filter_csfs(csf_filter)
 
