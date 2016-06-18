@@ -52,11 +52,20 @@ function load_eng(directory)
     end
 end
 
+function principal_qn(n)
+    if n < 10
+        n
+    else
+        ":;<=>?"[n-9]
+    end
+end
+
 function orbital_string(c::Config,
                         occ = true, status = true,
-                        sep = "")
+                        sep = "";
+                        escape_principal_qn = false)
     c = map(c) do orb
-        s = "$(orb[1])$(ells[orb[2]+1])"
+        s = "$(escape_principal_qn ? principal_qn(orb[1]) : orb[1])$(ells[orb[2]+1])"
         if occ
             if status
                 s = string(s, "($(orb[3]),$(orb[4]))")

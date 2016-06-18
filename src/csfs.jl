@@ -90,6 +90,6 @@ n ! No more lists
     # Filter out active orbitals not present in the CSF list here
     cfgs = readall("clist.out")
     filter(active) do a
-        contains(cfgs, "$(a[1])$(ells[a[2]+1])")
+        contains(cfgs, "$(principal_qn(a[1]))$(ells[a[2]+1])")
     end
 end

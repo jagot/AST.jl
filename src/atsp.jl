@@ -21,7 +21,7 @@ function hf(name, term::Term, Z,
     pipe_file_run("$atsp/hf",
                   """$name,$(string(term)),$(float(Z)) ! Name, final term, Z (next row: closed orbitals)
  $closed
-$(orbital_string(ref_set, true, false)) ! Electrons outside closed orbitals
+$(orbital_string(ref_set, true, false; escape_principal_qn = true)) ! Electrons outside closed orbitals
 $vary ! Which orbitals to vary
 $(y_or_n(default_electron_parameters)) ! Default electron parameters
 $(y_or_n(default_rem_parameters)) ! Default values for remaining parameters
@@ -41,8 +41,8 @@ function mchf(name,Z,
     pipe_file_run("$atsp/mchf_mpi",
                   """$name,$(float(Z))
 $(join(term_weights, '\n'))
-$(orbital_string(active,false,false,","))
-$(orbital_string(spectroscopic,false,false,","))
+$(orbital_string(active,false,false,","; escape_principal_qn = true))
+$(orbital_string(spectroscopic,false,false,"," ; escape_principal_qn = true))
 y ! Default electron parameters
 n ! Custom other parameters
 y ! Default values for NO,REL,STRONG
