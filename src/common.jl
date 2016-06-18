@@ -1,7 +1,9 @@
 using JLD
 using AtomicLevels
+using Lumberjack
 
 function dir_run(f::Function, wd::AbstractString)
+    Lumberjack.info("Entering $(abspath(wd))")
     mkpath(wd)
     here = pwd()
     cd(wd)
@@ -11,6 +13,7 @@ function dir_run(f::Function, wd::AbstractString)
     finally
         cd(here)
     end
+    Lumberjack.info("Leaving $(abspath(wd))")
     res
 end
 
@@ -27,7 +30,10 @@ function pipe_file_run(cmd::AbstractString,
         write(file, contents)
     end
 
+    info("Executing $(cmd) with input file $(abspath(inp_file))")
+    debug("Input:\n$(contents)")
     mpi_run(pipeline(inp_file, cmd, stdout_file))
+    info("Finished $(cmd)")
 end
 
 cpf(src,dst) = cp(src, dst, remove_destination=true)

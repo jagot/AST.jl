@@ -1,11 +1,13 @@
 using AtomicLevels
 
 function nonh()
+    info("Executing nonh")
     # Angular integrals
     clean_mpi_tmp(r"fort.[0-9]+",
                   r"yint.lst.[0-9]+",
                   r"c.lst.[0-9]+")
     mpi_run(mpi_cmd("$atsp/nonh_mpi"))
+    info("Finished executing nonh")
 end
 
 function hf(name, term::Term, Z,

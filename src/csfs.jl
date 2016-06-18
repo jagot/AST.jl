@@ -1,4 +1,5 @@
 using AtomicLevels
+using Lumberjack
 
 function csfgenerate_input(active::Config,
                            term,
@@ -12,6 +13,12 @@ function csfgenerate_input(active::Config,
 $(orbital_string(active, false, false, ","))
 $(string(term,false)) ! Resulting term
 $nexc ! Number of excitations"""
+end
+
+function count_csfs()
+    csfs = split(readall("clist.out"), "\n")
+    c_pat = r"([0-9]+)([a-z])\([ 0-9]+\)"
+    count(l -> ismatch(c_pat, l), csfs)
 end
 
 function filter_csfs(f::Function)
@@ -63,6 +70,7 @@ function lsgen()
 end
 
 function csfgenerate(active::Config, csf_filter::Function, lists...)
+    info("CSF list generation, active set: $(active)")
     # If core not in list, the value is zero (no core)
     lists = join(map(l -> csfgenerate_input(active, l...), lists), "\ny\n")
     pipe_file_run("$atsp/csfexcitation",
@@ -73,7 +81,9 @@ n ! No more lists
     cpf("csfexcitation.log", "$(string(active)).exc")
     lsgen()
 
+    info("Before filtering: $(count_csfs()) CSFs")
     filter_csfs(csf_filter)
+    info("After filtering: $(count_csfs()) CSFs")
 
     cpf("clist.out", "cfg.inp")
 
