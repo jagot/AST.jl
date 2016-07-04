@@ -81,4 +81,6 @@ end
 
 active_file(active::Config, term::Term) = string(join(map(string, active), "_"), "_", string(term))
 
-export dir_run, pipe_file_run, cpf, y_or_n, save_eng, load_eng
+uncorrelated(filename) = "$(dirname(dirname(filename)))/0/$(basename(filename))"
+
+export dir_run, pipe_file_run, cpf, y_or_n, save_eng, load_eng, uncorrelated
