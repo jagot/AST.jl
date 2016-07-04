@@ -136,4 +136,78 @@ n ! No more lists
     end
 end
 
-export csfgenerate_input, csfgenerate, load_csfs, write_csfs
+# Strip all filled orbitals from the left, up until the first unfilled
+# orbital.
+function lstrip_filled(config::Config)
+    i = findfirst(o -> !filled(o), config)
+    i > 0 ? config[i:end] : config
+end
+lstrip_filled(cc) = lstrip_filled(cc[1]),cc[2]
+
+coupling_string(coupling) = @sprintf("%d%s",
+                                     round(Int, 2coupling[2]+1),
+                                     uppercase(ells[coupling[1]+1]))
+
+# Interleave two vectors of (possibly) different length.
+function interleave(a::AbstractVector,b::AbstractVector)
+    m = length(a)
+    n = length(b)
+    o = min(m,n)
+    c = vcat([[a[i]
+               b[i]]
+              for i in 1:o]...)
+    [c
+     a[o+1:m]
+     b[o+1:n]]
+end
+rinterleave(a::AbstractVector,b::AbstractVector) =
+    reverse(interleave(reverse(b),
+                       reverse(a)))
+
+function enumerate_csfs(filename, cfgs::Vector{Config} = Config[])
+    cfgs = copy(cfgs)
+    map!(lstrip_filled, cfgs)
+    cfg_filter = length(cfgs) > 0 ? (cfg -> cfg in cfgs) : (cfg -> true)
+
+    csfs = map(load_csfs(filename)) do block
+        map!(lstrip_filled, block)
+        unique_cfgs = unique(Config[cfg[1] for cfg in block])
+
+        # Find the minimum amount of coupling terms that need to be
+        # retained to unambiguously identify a state.
+        unique_couplings = [cfg => block[findfirst(c -> c[1] == cfg, block)][2]
+                            for cfg in unique_cfgs]
+        common_couplings = [cfg => length(unique_couplings[cfg])-1
+                            for cfg in unique_cfgs]
+        for cc in block
+            cfg,coupling = cc
+            i = findlast(i -> unique_couplings[cfg][i] == coupling[i],
+                         1:common_couplings[cfg])
+            common_couplings[cfg] = min(common_couplings[cfg], i)
+        end
+
+        # Generate state labels and enumerate them
+        block = map(enumerate(block)) do icc
+            i,cc = icc
+            cfg = cc[1]
+            coupling = cc[2][common_couplings[cfg]+1:end]
+            length(coupling) == 0 && (coupling = [cc[2][end]])
+
+            # Interleave configuration and coupling
+            label = join(map(string,
+                             rinterleave(cfg, map(coupling_string, coupling))), "_")
+
+            i,label,cfg,coupling
+        end
+
+        # Filter out cfgs not requested
+        filter(block) do cc
+            cfg_filter(cc[3])
+        end
+    end
+    labels = map(c -> c[2], vcat(csfs...))
+    sort(labels) == sort(unique(labels)) || error("Failed to generate unique labels")
+    csfs
+end
+
+export csfgenerate_input, csfgenerate, load_csfs, write_csfs, enumerate_csfs
