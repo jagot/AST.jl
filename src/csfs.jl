@@ -49,6 +49,7 @@ end
 
 function write_csfs(io::IO, csfs)
     for block in csfs
+        length(block) == 0 && continue
         closed_orbitals = closed(block[1][1])
         write(io, "\n")
         write(io, join([@sprintf("% 3d%s", o[1], ells[o[2]+1])
@@ -84,33 +85,12 @@ function count_csfs()
 end
 
 function filter_csfs(f::Function)
-    p = r"([0-9]+)([a-z])\(([ 0-9]+?)\)"
-    tp = r"([0-9]+)([A-Z])([0-9]*)"
-    open("clist.out") do infile
-        open("clist.filtered.out", "w") do outfile
-            while !eof(infile)
-                line = readline(infile)
-                if ismatch(p,line)
-                    c = map(matchall(p,line)) do m
-                        m = match(p,m)
-                        "$(m[1])$(m[2])$(strip(m[3]))"
-                    end
-                    config = ref_set_list(join(c, " "))
-                    term_line = readline(infile)
-                    m = match(tp, split(term_line)[end])
-                    term = Term(searchindex(ells,lowercase(m[2]))-1,
-                                (parse(Int, m[1])-1)//2, parity(config))
-                    if !f(config, term)
-                        continue
-                    end
-                    write(outfile, line)
-                    write(outfile, term_line)
-                else
-                    write(outfile, line)
-                end
-            end
+    csfs = map(load_csfs("clist.out")) do block
+        filter(block) do cfg
+            f(cfg...)
         end
     end
+    write_csfs("clist.filtered.out", csfs)
     cpf("clist.out", "clist.orig")
     cpf("clist.filtered.out", "clist.out")
 end
