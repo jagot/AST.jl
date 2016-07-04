@@ -19,7 +19,7 @@ function hf(name, term::Term, Z,
     closed = join([@sprintf("%2d%s", c[1], ells[c[2]+1]) for c in closed], " ")
 
     pipe_file_run("$atsp/hf",
-                  """$name,$(string(term)),$(float(Z)) ! Name, final term, Z (next row: closed orbitals)
+                  """$name,$(string(term,false)),$(float(Z)) ! Name, final term, Z (next row: closed orbitals)
  $closed
 $(orbital_string(ref_set, true, false; escape_principal_qn = true)) ! Electrons outside closed orbitals
 $vary ! Which orbitals to vary
@@ -214,7 +214,7 @@ function hf_mchf_bp(config::Config,
     conf, abspath("$conf/$ncorr/wfn.out")
 end
 
-export csfgenerate_input, csfgenerate, nonh, hf, mchf,
+export nonh, hf, mchf,
 atsp_save_run, breit_pauli,
 atsp_cp_wfn, read_hf_eng, read_mchf_eng, read_breit_pauli_eng,
 atsp_clean,
