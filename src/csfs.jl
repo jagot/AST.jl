@@ -18,23 +18,19 @@ end
 function load_csfs(filename::AbstractString)
     tp = r"([0-9]+)([A-Z])([0-9]*)"
 
-    blocks = map(strip, split(readall(filename), "*"))
+    blocks = split(readall(filename), "*\n")
 
     csf_blocks = map(blocks[1:end-1]) do block
         block = split(block, "\n")
-        closed_orbitals = if block[1][end] != ')'
-            orbs = join(["$(o)c" for o in split(block[1])], " ")
-            block = block[2:end]
-            fill(ref_set_list(orbs))
-        else
-            Config()
-        end
 
-        cfgs = map(block[1:2:end]) do cfg
+        closed_orbitals = fill(ref_set_list(join(["$(o)c" for o in split(block[2])], " ")))
+
+        cfgs = map(block[3:2:end]) do cfg
             [closed_orbitals
              ref_set_list(replace(replace(replace(cfg, "( ", "("), "(", ""), ")", ""))]
         end
-        couplings = map(block[2:2:end]) do t
+
+        couplings = map(block[4:2:end]) do t
             ms = map(tt -> match(tp, tt), split(t))
             map(ms) do m
                 S = (parse(Int, m[1]) - 1)//2
@@ -43,6 +39,7 @@ function load_csfs(filename::AbstractString)
                 L,S,sen
             end
         end
+
         collect(zip(cfgs,couplings))
     end
 end
