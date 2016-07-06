@@ -140,7 +140,7 @@ end
 # orbital.
 function lstrip_filled(config::Config)
     i = findfirst(o -> !filled(o), config)
-    i > 0 ? config[i:end] : config
+    i > 0 ? config[i:end] : config[end:end]
 end
 lstrip_filled(cc) = lstrip_filled(cc[1]),cc[2]
 
