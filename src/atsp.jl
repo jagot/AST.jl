@@ -14,7 +14,7 @@ function hf(name, term::Term, Z,
             closed::Config, ref_set::Config,
             vary = "all",
             default_electron_parameters = true,
-            default_rem_parameters = true,
+            rem_parameters = ["y","n","T,1.D-8","y","y"],
             additional_parameters = [])
     closed = join([@sprintf("%2d%s", c[1], ells[c[2]+1]) for c in closed], " ")
 
@@ -24,7 +24,8 @@ function hf(name, term::Term, Z,
 $(orbital_string(ref_set, true, false; escape_principal_qn = true)) ! Electrons outside closed orbitals
 $vary ! Which orbitals to vary
 $(y_or_n(default_electron_parameters)) ! Default electron parameters
-$(y_or_n(default_rem_parameters)) ! Default values for remaining parameters
+$(y_or_n(length(rem_parameters)==0)) ! Remaining parameters
+$(join(rem_parameters, "\n"))
 $(y_or_n(length(additional_parameters)>0)) ! Additional parameters
 $(join(additional_parameters, "\n"))
 n ! Don't continue along the sequence
