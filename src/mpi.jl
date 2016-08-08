@@ -19,11 +19,15 @@ function init_mpi(f::Function, np::Int, tmp::AbstractString)
 
     res = f()
 
-    rm(mpi_tmp, recursive=true)
-    mpi = false
-    mpi_np = 1
+    deinit_mpi()
 
     res
+end
+
+function deinit_mpi()
+    isdir(mpi_tmp) && rm(mpi_tmp, recursive=true)
+    mpi = false
+    mpi_np = 1
 end
 
 function write_mpi_disks()
