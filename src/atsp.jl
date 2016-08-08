@@ -35,7 +35,7 @@ end
 function mchf(name,Z,
               term_weights,
               active::Config,
-              spectroscopic::Config = [],
+              spectroscopic::Config = [];
               iter = 200,
               cfg_tol = 1e-8,
               scf_tol = 1e-8)

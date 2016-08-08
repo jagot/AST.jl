@@ -1,5 +1,4 @@
 using AtomicLevels
-using Lumberjack
 
 function csfgenerate_input(active::Config,
                            term,
